@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -21,12 +22,12 @@ import java.util.TimerTask;
 
 public class SplashActivity extends Activity {
     private TextView tv_splash_version;
+    private RelativeLayout r1_splash;
+    private static final String TAG = "SplashActivity:";
     private static final String[] permissionsArray = new String[]{
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION };
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
     //创建Timer对象
     Timer timer= new Timer();;
 
@@ -55,21 +56,23 @@ public class SplashActivity extends Activity {
 
 
         //获取组件
-        RelativeLayout r1_splash = (RelativeLayout) findViewById(R.id.r1_splash);
+        r1_splash = (RelativeLayout) findViewById(R.id.r1_splash);
         tv_splash_version = (TextView) findViewById(R.id.tv_splash_version);
 
         tv_splash_version.setText("版本号：" + getVersion());
 
-        //背景透明度变化3秒内从0.3变到1.0
-        AlphaAnimation aa = new AlphaAnimation(0.3f, 1.0f);
-        aa.setDuration(3000);
-        r1_splash.startAnimation(aa);
+
 
 
         //使用timer.schedule（）方法调用timerTask，定时3秒后执行run
         boolean granted = checkAndRequestPermission();
         if (granted) {
+            //背景透明度变化3秒内从0.3变到1.0
+            AlphaAnimation aa = new AlphaAnimation(0.3f, 1.0f);
+            aa.setDuration(3000);
+            r1_splash.startAnimation(aa);
             timer.schedule(timerTask, 3000);
+            Log.d(TAG, "onCreate: Timer 直接启动！");
         }
     }
 
@@ -114,7 +117,14 @@ public class SplashActivity extends Activity {
                 for (int i=0; i<permissions.length; i++) {
                     if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(SplashActivity.this, "做一些申请成功的权限对应的事！"+permissions[i], Toast.LENGTH_SHORT).show();
-                        timer.schedule(timerTask, 3000);
+                        if (0 == i){  //当位置权限申请了就启动
+                            Log.d(TAG, "onCreate: Timer 申请权限后启动！");
+                            //背景透明度变化3秒内从0.3变到1.0
+                            AlphaAnimation aa = new AlphaAnimation(0.3f, 1.0f);
+                            aa.setDuration(3000);
+                            r1_splash.startAnimation(aa);
+                            timer.schedule(timerTask, 3000);
+                        }
                     } else {
                         Toast.makeText(SplashActivity.this, "权限被拒绝： "+permissions[i], Toast.LENGTH_SHORT).show();
                     }
