@@ -101,18 +101,6 @@ public class SplashActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){ //权限号。
-            case 0:
-                if (Manifest.permission.READ_SMS.equals(permissions[0])
-                        && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                    RunntimePermissionHelper.showDeniedPromptIfNeeded(this, permissions[0]);
-                    finish();
-                    Toast.makeText(this,"拒绝访问SMS",Toast.LENGTH_LONG).show();
-                }else {
-
-                }
-                break;
-            case 1:
-                break;
             case RunntimePermissionHelper.REQUEST_CODE_ASK_PERMISSIONS:
                 for (int i=0; i<permissions.length; i++) {
                     if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
