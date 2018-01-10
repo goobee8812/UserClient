@@ -1,7 +1,9 @@
 package com.example.administrator.userclient;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -32,6 +34,7 @@ import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.example.administrator.userclient.login.UserLoginActivity;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -162,6 +165,17 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings:
+                break;
+            case R.id.action_log_off:
+                //写入数据到SP
+                SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SP, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putInt(Utils.LOGIN_STATUS, 0);
+                editor.commit();
+                //退出到登录界面
+                Intent intent = new Intent(MainActivity.this, UserLoginActivity.class);
+                startActivity(intent);
+                finish();
                 break;
             default:
                 break;
@@ -362,6 +376,7 @@ public class MainActivity extends AppCompatActivity {
                 StringBuffer sb = new StringBuffer();
                 //errCode等于0代表定位成功，其他的为定位失败，具体的可以参照官网定位错误码说明
                 if(location.getErrorCode() == 0){
+                    if(location.getAccuracy() < 50)
                     mLatitude = location.getLatitude();
                     mLongitude = location.getLongitude();
                     sb.append("定位成功" + "\n");
@@ -419,7 +434,6 @@ public class MainActivity extends AppCompatActivity {
         LatLng latLng = new LatLng(mLatitude, mLongitude);
         aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
     }
-
 }
 
 

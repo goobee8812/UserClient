@@ -34,6 +34,12 @@ public class Utils {
 	
 	public final static String KEY_URL = "URL";
 	public final static String URL_H5LOCATION = "file:///android_asset/location.html";
+	public static final String LOGIN_SP = "LOGIN_SP";
+	public static final String LOGIN_STATUS = "LOGIN_STATUS";
+	public static final String LOGIN_USER = "LOGIN_USER";
+	public static final String LOGIN_PASSWORD = "LOGIN_PASSWORD";
+
+
 	/**
 	 * 根据定位结果返回定位信息的字符串
 	 * @param location

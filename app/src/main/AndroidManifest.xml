@@ -43,15 +43,21 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
-
         </activity>
         <activity
             android:name=".StatusActivity"
             android:label="@string/title_activity_status"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-
-        <activity android:name=".SplashActivity">
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/splash">
+        </activity>
+        <activity
+            android:name=".login.UserLoginActivity">
+        </activity>
+        <activity android:name=".FirstActivity"
+                  android:theme="@style/splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

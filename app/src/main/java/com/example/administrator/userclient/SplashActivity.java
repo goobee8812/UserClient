@@ -2,7 +2,9 @@ package com.example.administrator.userclient;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -16,6 +18,8 @@ import android.view.animation.AlphaAnimation;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.administrator.userclient.login.UserLoginActivity;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,8 +39,19 @@ public class SplashActivity extends Activity {
     TimerTask timerTask = new TimerTask() {
         @Override
         public void run() {
-            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-            startActivity(intent);
+            //读取 SP 数据
+            SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SP, Context.MODE_PRIVATE);
+            int loginStatus = sp.getInt(Utils.LOGIN_STATUS, 0);
+
+            if (loginStatus == 1){ //已经登录后直接到主界面
+                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                startActivity(intent);
+            }else { //未登录跳转登录界面
+//                UserLoginActivity
+                Intent intent = new Intent(SplashActivity.this, UserLoginActivity.class);
+                startActivity(intent);
+            }
+
             timer.cancel();
             finish();
         }

@@ -1,0 +1,111 @@
+package com.example.administrator.userclient.login;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import com.example.administrator.userclient.MainActivity;
+import com.example.administrator.userclient.R;
+import com.example.administrator.userclient.Utils;
+
+public class UserLoginActivity extends AppCompatActivity implements IUserLoginView {
+   private EditText et_username;
+   private EditText et_password;
+   private Button btn_login;
+   private Button btn_clear;
+   private ProgressDialog dialog;
+   private UserLoginPresenter mUserLoginPresenter = new UserLoginPresenter(this);
+
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      setContentView(R.layout.activity_user_login);
+
+      et_username = (EditText) findViewById(R.id.et_username);
+      et_password = (EditText) findViewById(R.id.et_password);
+      btn_login = (Button) findViewById(R.id.btn_login);
+      btn_clear = (Button) findViewById(R.id.btn_clear);
+      dialog = new ProgressDialog(this);
+      btn_login.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View v) {
+            mUserLoginPresenter.login();
+         }
+      });
+      btn_clear.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View v) {
+            mUserLoginPresenter.clear();
+         }
+      });
+
+   }
+
+   @Override
+   public String getUserName() {
+      return et_username.getText().toString();
+   }
+
+   @Override
+   public String getPassword() {
+      return et_password.getText().toString();
+   }
+
+   @Override
+   public void showLoading() {
+
+      dialog.show();
+   }
+
+   @Override
+   public void hideLoading() {
+      dialog.hide();
+   }
+
+   @Override
+   public void toMainActivity(User user) {
+      Toast.makeText(this, user.getUsername() +
+              " 登录成功", Toast.LENGTH_SHORT).show();
+      Intent intent  = new Intent(this,MainActivity.class);
+      startActivity(intent);
+      //写入数据到SP
+      SharedPreferences sp = getSharedPreferences(Utils.LOGIN_SP, Context.MODE_PRIVATE);
+      SharedPreferences.Editor editor = sp.edit();
+      editor.putInt(Utils.LOGIN_STATUS, 1);
+      editor.putString(Utils.LOGIN_USER,getUserName());  //保存账号
+      //选择是否保存密码----
+      editor.commit();
+
+      finish();
+   }
+
+   @Override
+   public void showFailedError() {
+      Toast.makeText(this,
+              "登录失败", Toast.LENGTH_SHORT).show();
+   }
+
+   @Override
+   public void clearUserName() {
+      et_username.setText("");
+   }
+
+   @Override
+   public void clearPassword() {
+      et_password.setText("");
+   }
+
+   @Override
+   public void clearAll() {
+      et_username.setText("");
+      et_password.setText("");
+   }
+
+}
