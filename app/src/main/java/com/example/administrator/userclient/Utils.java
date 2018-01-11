@@ -34,10 +34,11 @@ public class Utils {
 	
 	public final static String KEY_URL = "URL";
 	public final static String URL_H5LOCATION = "file:///android_asset/location.html";
-	public static final String LOGIN_SP = "LOGIN_SP";
-	public static final String LOGIN_STATUS = "LOGIN_STATUS";
-	public static final String LOGIN_USER = "LOGIN_USER";
-	public static final String LOGIN_PASSWORD = "LOGIN_PASSWORD";
+	public static final String LOGIN_SP = "LOGIN_SP";				  //SP保存KEY
+	public static final String LOGIN_STATUS = "LOGIN_STATUS";	  //是否登录KEY
+	public static final String LOGIN_USER = "LOGIN_USER";			  //账号KEY
+	public static final String LOGIN_PASSWORD = "LOGIN_PASSWORD"; //密码KEY
+	public static final String LOGIN_REMEMBER = "LOGIN_REMEMBER"; //是否记住密码KEY
 
 
 	/**
