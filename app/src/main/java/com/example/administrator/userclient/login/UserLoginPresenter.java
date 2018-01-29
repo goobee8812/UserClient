@@ -11,11 +11,11 @@ import android.os.Handler;
 public class UserLoginPresenter {
 
    private IUserBiz userBiz;
-   private IUserLoginView userLoginView;
+   private IUserLoginRegisterView userLoginView;
 
    private Handler mHandler = new Handler();
 
-   public UserLoginPresenter(IUserLoginView iUserLoginView){
+   public UserLoginPresenter(IUserLoginRegisterView iUserLoginView){
       userLoginView = iUserLoginView;
       userBiz = new UserBiz();
    }
@@ -61,10 +61,38 @@ public class UserLoginPresenter {
 
    }
 
-   public void clear() {
+   public void register() {
       // TODO: implement
-      userLoginView.clearUserName();
-      userLoginView.clearPassword();
+      userLoginView.showLoading();
+      userBiz.register(userLoginView.getUserName(), userLoginView.getPassword(), userLoginView.getEmail(), new OnRegisterListener() {
+         @Override
+         public void registerSuccess(final UserRegisterInfo userRegisterInfo) {
+            //需要在UI线程执行
+            mHandler.post(new Runnable()
+            {
+               @Override
+               public void run()
+               {
+                  userLoginView.toMainActivity(userRegisterInfo);
+                  userLoginView.hideLoading();
+               }
+            });
+         }
+
+         @Override
+         public void registerFailed() {
+            //需要在UI线程执行
+            mHandler.post(new Runnable()
+            {
+               @Override
+               public void run()
+               {
+                  userLoginView.showFailedError();
+                  userLoginView.hideLoading();
+               }
+            });
+         }
+      });
    }
 
 }

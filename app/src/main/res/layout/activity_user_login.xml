@@ -10,6 +10,7 @@
     <EditText android:id="@+id/et_password" android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:layout_marginTop="10dp"
+              android:inputType="textPassword"
               android:hint="密码"/>
     <CheckBox
         android:id="@+id/cb_rempass"
@@ -22,11 +23,11 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="登录"/>
-        <Button android:id="@+id/btn_clear" android:layout_width="0dp"
+        <Button android:id="@+id/btn_login_register" android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1"
-                android:text="清除"/>
+                android:text="注册"/>
     </LinearLayout>
 
 </LinearLayout>

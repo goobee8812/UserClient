@@ -38,7 +38,9 @@ public class Utils {
 	public static final String LOGIN_STATUS = "LOGIN_STATUS";	  //是否登录KEY
 	public static final String LOGIN_USER = "LOGIN_USER";			  //账号KEY
 	public static final String LOGIN_PASSWORD = "LOGIN_PASSWORD"; //密码KEY
+	public static final String LOGIN_EMAIL = "LOGIN_EMAIL"; 			//密码KEY
 	public static final String LOGIN_REMEMBER = "LOGIN_REMEMBER"; //是否记住密码KEY
+
 
 
 	/**

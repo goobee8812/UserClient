@@ -34,7 +34,13 @@ import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.example.administrator.userclient.db.UsersInfo;
 import com.example.administrator.userclient.login.UserLoginActivity;
+
+import org.litepal.crud.DataSupport;
+import org.litepal.tablemanager.Connector;
+
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -69,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ActivityCollector.addActivity(this);
         getDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         Log.d(TAG, "onCreate: " + getDrawerLayout.getParent());
         //获取地图控件引用
@@ -125,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init(){
+        Connector.getDatabase();
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         //获取引入的 layout的控件
@@ -145,6 +153,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         setSupportActionBar(toolbar);
+
+        //提取上一个activity传进来的URL
+        //取得从上一个Activity当中传递过来的Intent对象
+        Intent intent = getIntent();
+        //从Intent当中根据key取得value
+        userText.setText(intent.getStringExtra(Utils.LOGIN_USER));
+        emailText.setText(intent.getStringExtra(Utils.LOGIN_EMAIL));
     }
 
 
@@ -165,6 +180,14 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings:
+                //打印数据库内容，测试用
+                List<UsersInfo> usersInfos = DataSupport.findAll(UsersInfo.class);
+                Toast.makeText(this,"数据库数据：" + usersInfos.size(),Toast.LENGTH_SHORT).show();
+//                for(UsersInfo usersInfo : usersInfos){ //遍历books数组的内容
+//                    Log.d(TAG, "The username is :" + usersInfo.getUsername());
+//                    Log.d(TAG, "The password is :" + usersInfo.getPassword());
+//                    Log.d(TAG, "The email is :" + usersInfo.getEmail());
+//                }
                 break;
             case R.id.action_log_off:
                 //写入数据到SP
@@ -205,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "再按一次退出", Toast.LENGTH_SHORT).show();
             mExitTime = System.currentTimeMillis();
         } else {
-            finish();
+            ActivityCollector.finishAll();
             System.exit(0);
         }
     }
@@ -230,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
         destroyLocation();
+        ActivityCollector.removeActivity(this);
     }
 
     @Override
@@ -418,8 +442,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //解析定位结果，
                 String result = sb.toString();
-//                tvResult.setText(result);
-                Log.d(TAG, "onLocationChanged: " + result);
+//                Log.d(TAG, "onLocationChanged: " + result);
             } else {
 //                tvResult.setText("定位失败，loc is null");
                 Log.d(TAG, "onLocationChanged: " + "定位失败，loc is null");

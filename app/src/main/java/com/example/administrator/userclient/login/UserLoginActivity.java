@@ -12,15 +12,16 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.administrator.userclient.ActivityCollector;
 import com.example.administrator.userclient.MainActivity;
 import com.example.administrator.userclient.R;
 import com.example.administrator.userclient.Utils;
 
-public class UserLoginActivity extends AppCompatActivity implements IUserLoginView {
+public class UserLoginActivity extends AppCompatActivity implements IUserLoginRegisterView {
    private EditText et_username;
    private EditText et_password;
    private Button btn_login;
-   private Button btn_clear;
+   private Button btn_register;
    private CheckBox cb_rempass;
    private ProgressDialog dialog;
    private UserLoginPresenter mUserLoginPresenter = new UserLoginPresenter(this);
@@ -30,11 +31,12 @@ public class UserLoginActivity extends AppCompatActivity implements IUserLoginVi
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_user_login);
+       ActivityCollector.addActivity(this);
       sp  = getSharedPreferences(Utils.LOGIN_SP, Context.MODE_PRIVATE);
       et_username = (EditText) findViewById(R.id.et_username);
       et_password = (EditText) findViewById(R.id.et_password);
       btn_login = (Button) findViewById(R.id.btn_login);
-      btn_clear = (Button) findViewById(R.id.btn_clear);
+      btn_register = (Button) findViewById(R.id.btn_login_register);
       cb_rempass = (CheckBox) findViewById(R.id.cb_rempass);
       dialog = new ProgressDialog(this);
       boolean isRemenber = sp.getBoolean(Utils.LOGIN_REMEMBER,false);
@@ -53,10 +55,11 @@ public class UserLoginActivity extends AppCompatActivity implements IUserLoginVi
             mUserLoginPresenter.login();
          }
       });
-      btn_clear.setOnClickListener(new View.OnClickListener() {
+      btn_register.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View v) {
-            mUserLoginPresenter.clear();
+//            mUserLoginPresenter.register();
+             toRegisterActivity();
          }
       });
 
@@ -72,7 +75,17 @@ public class UserLoginActivity extends AppCompatActivity implements IUserLoginVi
       return et_password.getText().toString();
    }
 
-   @Override
+    @Override
+    public String getRepeatPassword() {
+        return null;
+    }
+
+    @Override
+    public String getEmail() {
+        return null;
+    }
+
+    @Override
    public void showLoading() {
 
       dialog.show();
@@ -101,31 +114,30 @@ public class UserLoginActivity extends AppCompatActivity implements IUserLoginVi
       }
       editor.commit();
 
-      Intent intent  = new Intent(this,MainActivity.class);
-      startActivity(intent);
-      finish();
+        Intent intent  = new Intent(this,MainActivity.class);
+       //在Intent对象当中添加一个键值对
+       intent.putExtra(Utils.LOGIN_USER, getUserName());
+       intent.putExtra(Utils.LOGIN_EMAIL, getUserName()); //在数据库获取 邮箱地址
+        startActivity(intent);
+        ActivityCollector.removeActivity(this);
+        finish();
    }
 
-   @Override
+    @Override
+    public void toMainActivity(UserRegisterInfo user) {
+
+    }
+
+    @Override
    public void showFailedError() {
       Toast.makeText(this,
               "登录失败", Toast.LENGTH_SHORT).show();
    }
 
    @Override
-   public void clearUserName() {
-      et_username.setText("");
+   public void toRegisterActivity() {
+      //跳转到注册界面
+      Intent intent = new Intent(UserLoginActivity.this,UserRegisterActivity.class);
+       startActivity(intent);
    }
-
-   @Override
-   public void clearPassword() {
-      et_password.setText("");
-   }
-
-   @Override
-   public void clearAll() {
-      et_username.setText("");
-      et_password.setText("");
-   }
-
 }

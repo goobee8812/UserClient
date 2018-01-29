@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <EditText android:id="@+id/register_username" android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:hint="请输入用户名"/>
+    <EditText android:id="@+id/register__password" android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="10dp"
+              android:inputType="textPassword"
+              android:hint="请输入密码"/>
+    <EditText android:id="@+id/register_repeat_password" android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="10dp"
+              android:inputType="textPassword"
+              android:hint="再次输入密码"/>
+    <EditText android:id="@+id/register_email" android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="10dp"
+              android:inputType="textEmailAddress"
+              android:hint="请输入邮箱"/>
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content">
+        <Button android:id="@+id/btn_register" android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="注册"/>
+        <Button android:id="@+id/btn_cancel" android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:text="取消"/>
+    </LinearLayout>
+
+</LinearLayout>
