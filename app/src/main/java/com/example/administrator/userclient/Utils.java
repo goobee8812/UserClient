@@ -9,6 +9,8 @@ import com.amap.api.location.AMapLocation;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 辅助工具类
@@ -102,5 +104,12 @@ public class Utils {
 			sdf.applyPattern(strPattern);
 		}
 		return sdf == null ? "NULL" : sdf.format(l);
+	}
+
+	public static boolean isEmail(String strEmail) {
+		String strPattern = "^[a-zA-Z][\\w\\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\\w\\.-]*[a-zA-Z0-9]\\.[a-zA-Z][a-zA-Z\\.]*[a-zA-Z]$";
+		Pattern p = Pattern.compile(strPattern);
+		Matcher m = p.matcher(strEmail);
+		return m.matches();
 	}
 }

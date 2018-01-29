@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,7 +18,10 @@ import com.example.administrator.userclient.R;
 import com.example.administrator.userclient.Utils;
 import com.example.administrator.userclient.db.UsersInfo;
 
+import org.litepal.crud.DataSupport;
 import org.litepal.tablemanager.Connector;
+
+import java.util.List;
 
 public class UserRegisterActivity extends AppCompatActivity implements View.OnClickListener,IUserLoginRegisterView{
 
@@ -57,9 +61,28 @@ public class UserRegisterActivity extends AppCompatActivity implements View.OnCl
         switch (v.getId()){
             case R.id.btn_register:
                 //检测输入框是否为空，为空则提示：
-                if (getEmail() == "" || getPassword() == "" || getEmail() == "" || getRepeatPassword() == ""){
+                if (getUserName().equals("")|| getPassword().equals("") || getEmail().equals("") || getRepeatPassword().equals("")){
                     //提示有空输入
                     Toast.makeText(this,"请输入所有输入项！",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (!getPassword().equals(getRepeatPassword()) ){
+                    //两次输密码不一致
+                    Toast.makeText(this,"两次输入密码不一致！",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                //查询是否存在账
+//                List<UsersInfo> usersInfos = DataSupport.select("username",getUserName()).find(UsersInfo.class);
+
+//                if(usersInfos.size() > 0){ //查找没有重复的
+//                    //账号名已注册
+//                    Toast.makeText(this,"账号已存在！",Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+                if(!Utils.isEmail(getEmail())){
+                    //邮箱地址格式不对
+                    Toast.makeText(this,"邮箱格式不对！",Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 mUserLoginPresenter.register();
                 break;
