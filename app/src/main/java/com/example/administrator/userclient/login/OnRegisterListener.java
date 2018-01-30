@@ -6,5 +6,5 @@ package com.example.administrator.userclient.login;
 
 public interface OnRegisterListener {
     void registerSuccess(UserRegisterInfo userRegisterInfo);
-    void registerFailed();
+    void registerFailed(String errorStr);
 }

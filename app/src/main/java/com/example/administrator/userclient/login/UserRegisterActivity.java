@@ -66,24 +66,6 @@ public class UserRegisterActivity extends AppCompatActivity implements View.OnCl
                     Toast.makeText(this,"请输入所有输入项！",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (!getPassword().equals(getRepeatPassword()) ){
-                    //两次输密码不一致
-                    Toast.makeText(this,"两次输入密码不一致！",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                //查询是否存在账
-//                List<UsersInfo> usersInfos = DataSupport.select("username",getUserName()).find(UsersInfo.class);
-
-//                if(usersInfos.size() > 0){ //查找没有重复的
-//                    //账号名已注册
-//                    Toast.makeText(this,"账号已存在！",Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-                if(!Utils.isEmail(getEmail())){
-                    //邮箱地址格式不对
-                    Toast.makeText(this,"邮箱格式不对！",Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 mUserLoginPresenter.register();
                 break;
             case R.id.btn_cancel:
@@ -159,9 +141,9 @@ public class UserRegisterActivity extends AppCompatActivity implements View.OnCl
     }
 
     @Override
-    public void showFailedError() {
+    public void showFailedError(String errorStr) {
         Toast.makeText(this,
-                "注册失败", Toast.LENGTH_SHORT).show();
+                errorStr, Toast.LENGTH_LONG).show();
         //失败有两种1、账号已经存在。2、两次输入密码不一致
 
     }

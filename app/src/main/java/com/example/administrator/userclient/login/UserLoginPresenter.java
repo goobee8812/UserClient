@@ -42,7 +42,7 @@ public class UserLoginPresenter {
          }
 
          @Override
-         public void loginFailed()
+         public void loginFailed(final String errorStr)
          {
             //需要在UI线程执行
             mHandler.post(new Runnable()
@@ -50,7 +50,7 @@ public class UserLoginPresenter {
                @Override
                public void run()
                {
-                  userLoginView.showFailedError();
+                  userLoginView.showFailedError(errorStr);
                   userLoginView.hideLoading();
                }
             });
@@ -64,7 +64,7 @@ public class UserLoginPresenter {
    public void register() {
       // TODO: implement
       userLoginView.showLoading();
-      userBiz.register(userLoginView.getUserName(), userLoginView.getPassword(), userLoginView.getEmail(), new OnRegisterListener() {
+      userBiz.register(userLoginView.getUserName(), userLoginView.getPassword(), userLoginView.getRepeatPassword(), userLoginView.getEmail(), new OnRegisterListener() {
          @Override
          public void registerSuccess(final UserRegisterInfo userRegisterInfo) {
             //需要在UI线程执行
@@ -80,14 +80,14 @@ public class UserLoginPresenter {
          }
 
          @Override
-         public void registerFailed() {
+         public void registerFailed(final String errorStr) {
             //需要在UI线程执行
             mHandler.post(new Runnable()
             {
                @Override
                public void run()
                {
-                  userLoginView.showFailedError();
+                  userLoginView.showFailedError(errorStr);
                   userLoginView.hideLoading();
                }
             });

@@ -16,6 +16,11 @@ import com.example.administrator.userclient.ActivityCollector;
 import com.example.administrator.userclient.MainActivity;
 import com.example.administrator.userclient.R;
 import com.example.administrator.userclient.Utils;
+import com.example.administrator.userclient.db.UsersInfo;
+
+import org.litepal.crud.DataSupport;
+
+import java.util.List;
 
 public class UserLoginActivity extends AppCompatActivity implements IUserLoginRegisterView {
    private EditText et_username;
@@ -117,7 +122,9 @@ public class UserLoginActivity extends AppCompatActivity implements IUserLoginRe
         Intent intent  = new Intent(this,MainActivity.class);
        //在Intent对象当中添加一个键值对
        intent.putExtra(Utils.LOGIN_USER, getUserName());
-       intent.putExtra(Utils.LOGIN_EMAIL, getUserName()); //在数据库获取 邮箱地址
+       //读取数据库
+       List<UsersInfo> usersInfos = DataSupport.where("username = ?",getUserName()).find(UsersInfo.class);
+       intent.putExtra(Utils.LOGIN_EMAIL, usersInfos.get(0).getEmail()); //在数据库获取 邮箱地址
         startActivity(intent);
         ActivityCollector.removeActivity(this);
         finish();
@@ -129,9 +136,9 @@ public class UserLoginActivity extends AppCompatActivity implements IUserLoginRe
     }
 
     @Override
-   public void showFailedError() {
+   public void showFailedError(String errorStr) {
       Toast.makeText(this,
-              "登录失败", Toast.LENGTH_SHORT).show();
+              errorStr, Toast.LENGTH_LONG).show();
    }
 
    @Override

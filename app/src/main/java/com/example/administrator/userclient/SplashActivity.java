@@ -19,8 +19,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.administrator.userclient.db.UsersInfo;
 import com.example.administrator.userclient.login.UserLoginActivity;
 
+import org.litepal.crud.DataSupport;
+
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -45,6 +49,11 @@ public class SplashActivity extends Activity {
 
             if (loginStatus == 1){ //已经登录后直接到主界面
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                //读取当前登录的账号数据
+                String userName = sp.getString(Utils.LOGIN_USER,"");
+                List<UsersInfo> usersInfos = DataSupport.where("username = ?",userName).find(UsersInfo.class);
+                intent.putExtra(Utils.LOGIN_USER, userName);
+                intent.putExtra(Utils.LOGIN_EMAIL, usersInfos.get(0).getEmail()); //在数据库获取 邮箱地址
                 startActivity(intent);
             }else { //未登录跳转登录界面
 //                UserLoginActivity

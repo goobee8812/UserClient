@@ -19,7 +19,7 @@ public interface IUserLoginRegisterView {
 
    void toMainActivity(UserRegisterInfo user);
 
-   void showFailedError();
+   void showFailedError(String errorStr);
 
    void toRegisterActivity();
 
