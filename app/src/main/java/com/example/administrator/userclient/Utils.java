@@ -43,7 +43,8 @@ public class Utils {
 	public static final String LOGIN_EMAIL = "LOGIN_EMAIL"; 			//邮箱KEY
 	public static final String LOGIN_REMEMBER = "LOGIN_REMEMBER"; //是否记住密码KEY
 
-
+	public static final String SAVE_SOMETHING = "SAVE_SOMETHING";  //SP保存一些东西
+	public static final String KEY_BITMAP = "KEY_BITMAP";				//bitmap的key
 
 	/**
 	 * 根据定位结果返回定位信息的字符串
@@ -112,4 +113,6 @@ public class Utils {
 		Matcher m = p.matcher(strEmail);
 		return m.matches();
 	}
+
+
 }

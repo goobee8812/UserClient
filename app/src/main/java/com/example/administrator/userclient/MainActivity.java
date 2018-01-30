@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +16,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -35,11 +38,16 @@ import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.example.administrator.userclient.db.UsersInfo;
+import com.example.administrator.userclient.eventbus.MessageEvent;
 import com.example.administrator.userclient.login.UserLoginActivity;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.crud.DataSupport;
 import org.litepal.tablemanager.Connector;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -82,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
         mMapView = (MapView) findViewById(R.id.iv_map);
         //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
         mMapView.onCreate(savedInstanceState);
-
+        //注册成为订阅者
+        EventBus.getDefault().register(this);
         //初始化
         init();
         boolean granted = checkAndRequestPermission();
@@ -94,6 +103,12 @@ public class MainActivity extends AppCompatActivity {
         //开启定位
         startLocation();
     }
+    //订阅方法，当接收到事件的时候，会调用该方法
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(MessageEvent messageEvent){
+        icoImage.setImageBitmap(messageEvent.getMessage());
+    }
+
     private void showMap()
     {
         if (aMap == null) {
@@ -144,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
         userText = (TextView) headerView.findViewById(R.id.username);
         emailText = (TextView) headerView.findViewById(R.id.mail);
         icoImage = (CircleImageView) headerView.findViewById(R.id.icon_image);
+        getBitmapFromSharedPreferences();
         icoImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -253,6 +269,8 @@ public class MainActivity extends AppCompatActivity {
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
         destroyLocation();
+        //解除注册
+        EventBus.getDefault().unregister(this);
         ActivityCollector.removeActivity(this);
     }
 
@@ -456,6 +474,26 @@ public class MainActivity extends AppCompatActivity {
         //取出经纬度
         LatLng latLng = new LatLng(mLatitude, mLongitude);
         aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+    }
+
+    //从SharedPreferences获取图片
+    public void getBitmapFromSharedPreferences(){
+        SharedPreferences sharedPreferences=getSharedPreferences(Utils.SAVE_SOMETHING, Context.MODE_PRIVATE);
+        //第一步:取出字符串形式的Bitmap
+        String imageString=sharedPreferences.getString(Utils.KEY_BITMAP, "");
+        //第二步:利用Base64将字符串转换为ByteArrayInputStream
+        byte[] byteArray= Base64.decode(imageString, Base64.DEFAULT);
+        if(byteArray.length==0){
+            //
+            Toast.makeText(this,"No Image!",Toast.LENGTH_LONG).show();
+            icoImage.setImageResource(R.mipmap.ic_launcher);
+        }else{
+            ByteArrayInputStream byteArrayInputStream=new ByteArrayInputStream(byteArray);
+
+            //第三步:利用ByteArrayInputStream生成Bitmap
+            Bitmap bitmap= BitmapFactory.decodeStream(byteArrayInputStream);
+            icoImage.setImageBitmap(bitmap);
+        }
     }
 }
 
