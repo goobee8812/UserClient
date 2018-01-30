@@ -32,10 +32,10 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/icon_text"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="90dp"
                 android:layout_weight="1"
-                android:drawableRight="@drawable/ic_chevron_right_black_24dp"
                 android:gravity="fill_vertical"
                 android:padding="10dp"
                 android:text="头像"
@@ -43,8 +43,8 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/icon_image_status"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
                 android:layout_centerInParent="true"
                 android:src="@mipmap/ic_launcher"/>
         </LinearLayout>
@@ -58,9 +58,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView
+                android:id="@+id/name_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableRight="@drawable/ic_chevron_right_black_24dp"
                 android:gravity="fill_vertical"
                 android:padding="10dp"
                 android:text="昵称"
@@ -77,10 +77,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
+                android:id="@+id/sex_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableRight="@drawable/ic_chevron_right_black_24dp"
                 android:gravity="fill_vertical"
                 android:padding="10dp"
                 android:text="性别"
@@ -98,9 +99,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
+                android:id="@+id/post_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableRight="@drawable/ic_chevron_right_black_24dp"
                 android:gravity="fill_vertical"
                 android:padding="10dp"
                 android:text="职位"

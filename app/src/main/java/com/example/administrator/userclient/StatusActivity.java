@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.userclient.eventbus.MessageEvent;
@@ -28,6 +29,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class StatusActivity extends AppCompatActivity {
 
     private CircleImageView icon_image = null;
+    private TextView icon_text = null;
     private static final int PHOTO_REQUEST_CAREMA = 1;// 拍照
     private static final int PHOTO_REQUEST_GALLERY = 2;// 从相册中选择
     private static final int PHOTO_REQUEST_CUT = 3;// 结果
@@ -49,9 +51,10 @@ public class StatusActivity extends AppCompatActivity {
         initView();
     }
     private void initView(){
+        icon_text = (TextView) findViewById(R.id.icon_text);
         icon_image = (CircleImageView) findViewById(R.id.icon_image_status);
         getBitmapFromSharedPreferences();
-        icon_image.setOnClickListener(new View.OnClickListener() {
+        icon_text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent1 = new Intent(Intent.ACTION_PICK);
@@ -117,7 +120,7 @@ public class StatusActivity extends AppCompatActivity {
                  * 获得图片
                  */
                 icon_image.setImageBitmap(bitmap);
-                //发送事件
+                //eventbus发送事件
                 EventBus.getDefault().post(new MessageEvent(bitmap));
                 //保存到SharedPreferences
                 saveBitmapToSharedPreferences(bitmap);
