@@ -63,8 +63,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".login.UserRegisterActivity"
-                  android:label="@string/register_name">
+        <activity
+            android:name=".login.UserRegisterActivity"
+            android:label="@string/register_name">
+        </activity>
+        <activity android:name=".PortraitActivity"
+                  android:label="@string/title_activity_status"
+                  android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 

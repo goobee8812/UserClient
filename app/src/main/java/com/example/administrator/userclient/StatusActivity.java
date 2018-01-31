@@ -63,6 +63,20 @@ public class StatusActivity extends AppCompatActivity {
                 startActivityForResult(intent1, PHOTO_REQUEST_GALLERY);
             }
         });
+        icon_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //点击显示头像
+                icon_image.setDrawingCacheEnabled(true);
+                Bitmap obmp = Bitmap.createBitmap(icon_image.getDrawingCache());
+                icon_image.setDrawingCacheEnabled(false);
+                //显示头像
+                Intent intent = new Intent(StatusActivity.this,PortraitActivity.class);
+                //传递bitmap只能先将bitmap进行转换为String
+                intent.putExtra(Utils.KEY_PORTRAIT,Utils.bitmapToString(obmp));
+                startActivity(intent);
+            }
+        });
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -155,7 +169,7 @@ public class StatusActivity extends AppCompatActivity {
     public void getBitmapFromSharedPreferences(){
         SharedPreferences sharedPreferences=getSharedPreferences(Utils.SAVE_SOMETHING, Context.MODE_PRIVATE);
         //第一步:取出字符串形式的Bitmap
-        String imageString=sharedPreferences.getString(Utils.KEY_BITMAP, "");
+        String imageString = sharedPreferences.getString(Utils.KEY_BITMAP, "");
         //第二步:利用Base64将字符串转换为ByteArrayInputStream
         byte[] byteArray=Base64.decode(imageString, Base64.DEFAULT);
         if(byteArray.length==0){
@@ -164,7 +178,6 @@ public class StatusActivity extends AppCompatActivity {
             icon_image.setImageResource(R.mipmap.ic_launcher);
         }else{
             ByteArrayInputStream byteArrayInputStream=new ByteArrayInputStream(byteArray);
-
             //第三步:利用ByteArrayInputStream生成Bitmap
             Bitmap bitmap= BitmapFactory.decodeStream(byteArrayInputStream);
             icon_image.setImageBitmap(bitmap);

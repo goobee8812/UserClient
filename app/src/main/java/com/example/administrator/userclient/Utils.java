@@ -3,10 +3,16 @@
  */
 package com.example.administrator.userclient;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.TextUtils;
+import android.util.Base64;
+import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -34,7 +40,7 @@ public class Utils {
 	 */
 	public final static int MSG_LOCATION_STOP= 2;
 	
-	public final static String KEY_URL = "URL";
+	public final static String KEY_PORTRAIT = "KEY_PORTRAIT";
 	public final static String URL_H5LOCATION = "file:///android_asset/location.html";
 	public static final String LOGIN_SP = "LOGIN_SP";				  //SP保存KEY
 	public static final String LOGIN_STATUS = "LOGIN_STATUS";	  //是否登录KEY
@@ -114,5 +120,27 @@ public class Utils {
 		return m.matches();
 	}
 
+	public static String bitmapToString(Bitmap bitmap) {
+		//第一步:将Bitmap压缩至字节数组输出流ByteArrayOutputStream
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+		//第二步:利用Base64将字节数组输出流中的数据转换成字符串String
+		byte[] byteArray = byteArrayOutputStream.toByteArray();
+		String imageString = new String(Base64.encodeToString(byteArray, Base64.DEFAULT));
+		return imageString;
+	}
 
+	public static Bitmap stringToBitmapp(String s) {
+		//第1步:利用Base64将字符串转换为ByteArrayInputStream
+		byte[] byteArray=Base64.decode(s, Base64.DEFAULT);
+		if(byteArray.length==0){
+			//
+			return null;
+		}else{
+			ByteArrayInputStream byteArrayInputStream=new ByteArrayInputStream(byteArray);
+			//第2步:利用ByteArrayInputStream生成Bitmap
+			Bitmap bitmap = BitmapFactory.decodeStream(byteArrayInputStream);
+			return bitmap;
+		}
+	}
 }

@@ -5,4 +5,5 @@
     <string name="title_activity_status">StatusActivity</string>
     <string name="rempassword">记住密码</string>
     <string name="register_name">注册</string>
+    <string name="title_activity_portrait">头像</string>
 </resources>
