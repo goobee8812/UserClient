@@ -155,6 +155,35 @@ public class MainActivity extends AppCompatActivity {
          * 先获取navigation控件，通过getHeadView获取设置的头xml
          */
         navigationView = (NavigationView)findViewById(R.id.nav_view);
+        navigationView.setCheckedItem(R.id.nav_friends);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                //可以写触发逻辑处理
+                navigationView.setCheckedItem(item.getItemId());
+                drawerLayout.closeDrawers();
+                switch (item.getItemId()){
+                    case R.id.nav_call:
+                        Toast.makeText(MainActivity.this,"Hello Call!",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_friends:
+                        Toast.makeText(MainActivity.this,"Hello Friends!",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_location:
+                        Toast.makeText(MainActivity.this,"Hello Location!",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_mail:
+                        Toast.makeText(MainActivity.this,"Hello Mail!",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_task:
+                        Toast.makeText(MainActivity.this,"Hello Task!",Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
         View headerView = navigationView.getHeaderView(0);
         userText = (TextView) headerView.findViewById(R.id.username);
         emailText = (TextView) headerView.findViewById(R.id.mail);
@@ -199,11 +228,6 @@ public class MainActivity extends AppCompatActivity {
                 //打印数据库内容，测试用
                 List<UsersInfo> usersInfos = DataSupport.findAll(UsersInfo.class);
                 Toast.makeText(this,"数据库数据：" + usersInfos.size(),Toast.LENGTH_SHORT).show();
-//                for(UsersInfo usersInfo : usersInfos){ //遍历books数组的内容
-//                    Log.d(TAG, "The username is :" + usersInfo.getUsername());
-//                    Log.d(TAG, "The password is :" + usersInfo.getPassword());
-//                    Log.d(TAG, "The email is :" + usersInfo.getEmail());
-//                }
                 break;
             case R.id.action_log_off:
                 //写入数据到SP

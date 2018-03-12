@@ -63,7 +63,6 @@ public class UserLoginActivity extends AppCompatActivity implements IUserLoginRe
       btn_register.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View v) {
-//            mUserLoginPresenter.register();
              toRegisterActivity();
          }
       });
