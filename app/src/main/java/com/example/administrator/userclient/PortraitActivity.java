@@ -9,6 +9,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import com.example.administrator.userclient.utils.Utils;
+
 public class PortraitActivity extends AppCompatActivity {
     private ImageView portrait_image;
     @Override

@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -21,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.administrator.userclient.db.UsersInfo;
 import com.example.administrator.userclient.login.UserLoginActivity;
+import com.example.administrator.userclient.utils.Utils;
 
 import org.litepal.crud.DataSupport;
 
@@ -93,9 +93,9 @@ public class SplashActivity extends Activity {
         if (granted) {
             //背景透明度变化3秒内从0.3变到1.0
             AlphaAnimation aa = new AlphaAnimation(0.3f, 1.0f);
-            aa.setDuration(3000);
+            aa.setDuration(1000);
             r1_splash.startAnimation(aa);
-            timer.schedule(timerTask, 3000);
+            timer.schedule(timerTask, 1000);
             Log.d(TAG, "onCreate: Timer 直接启动！");
         }
     }

@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.example.administrator.userclient.ActivityCollector;
 import com.example.administrator.userclient.MainActivity;
 import com.example.administrator.userclient.R;
-import com.example.administrator.userclient.Utils;
+import com.example.administrator.userclient.utils.Utils;
 import com.example.administrator.userclient.db.UsersInfo;
 
 import org.litepal.crud.DataSupport;
@@ -91,7 +91,6 @@ public class UserLoginActivity extends AppCompatActivity implements IUserLoginRe
 
     @Override
    public void showLoading() {
-
       dialog.show();
    }
 

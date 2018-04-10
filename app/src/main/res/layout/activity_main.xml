@@ -27,11 +27,13 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <com.amap.api.maps.MapView
-            android:id="@+id/iv_map"
+        <FrameLayout
+            android:layout_marginTop="?attr/actionBarSize"
+            android:id="@+id/id_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-        </com.amap.api.maps.MapView>
+
+        </FrameLayout>
 
     </android.support.design.widget.CoordinatorLayout>
 
