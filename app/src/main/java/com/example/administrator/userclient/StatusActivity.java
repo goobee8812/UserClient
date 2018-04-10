@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.userclient.eventbus.MessageEvent;
+import com.example.administrator.userclient.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -157,7 +158,7 @@ public class StatusActivity extends AppCompatActivity {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         //第二步:利用Base64将字节数组输出流中的数据转换成字符串String
         byte[] byteArray = byteArrayOutputStream.toByteArray();
-        String imageString = new String(Base64.encodeToString(byteArray, Base64.DEFAULT));
+        String imageString = Base64.encodeToString(byteArray, Base64.DEFAULT);
         //第三步:将String保持至SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences(Utils.SAVE_SOMETHING, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

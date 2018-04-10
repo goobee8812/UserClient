@@ -25,16 +25,16 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
     <application
-        android:name="org.litepal.LitePalApplication"
+        android:name=".utils.MyApplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_android_black_24dp"
+        android:icon="@mipmap/logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="f4c0e0af17f5df1881e0c58b956f9d76">
+            android:value="82c7c78be2260507109036413b6682fa">
         </meta-data>
 
         <service android:name="com.amap.api.location.APSService">

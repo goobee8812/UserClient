@@ -1,9 +1,7 @@
 package com.example.administrator.userclient.login;
 
 
-import android.widget.Toast;
-
-import com.example.administrator.userclient.Utils;
+import com.example.administrator.userclient.utils.Utils;
 import com.example.administrator.userclient.db.UsersInfo;
 
 import org.litepal.crud.DataSupport;

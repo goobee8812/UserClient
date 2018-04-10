@@ -7,39 +7,33 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
-import com.amap.api.maps.AMap;
-import com.amap.api.maps.CameraUpdateFactory;
-import com.amap.api.maps.LocationSource;
-import com.amap.api.maps.MapView;
-import com.amap.api.maps.model.BitmapDescriptorFactory;
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.MyLocationStyle;
 import com.example.administrator.userclient.db.UsersInfo;
 import com.example.administrator.userclient.eventbus.MessageEvent;
+import com.example.administrator.userclient.fragment.FragmentCall;
+import com.example.administrator.userclient.fragment.FragmentFriends;
+import com.example.administrator.userclient.fragment.FragmentLocation;
+import com.example.administrator.userclient.fragment.FragmentMail;
+import com.example.administrator.userclient.fragment.FragmentTask;
 import com.example.administrator.userclient.login.UserLoginActivity;
+import com.example.administrator.userclient.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -55,30 +49,27 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "LLLLLLLL";
+
+    private Fragment friendsFragment;
+    private Fragment callFragment;
+    private Fragment locationFragment;
+    private Fragment mailFragment;
+    private Fragment taskFragment;
+
+
     private DrawerLayout drawerLayout = null;
     private CircleImageView icoImage = null;
     private TextView userText = null;
     private TextView emailText = null;
     private Toolbar toolbar = null;
-    private FloatingActionButton fab = null;
     private NavigationView navigationView = null;
     private DrawerLayout getDrawerLayout = null;
-    private double mLatitude;
-    private double mLongitude;
-    private Boolean firstMoveToLocation = true;
-    //定位
-    private MapView mMapView = null;
-    private AMap aMap;
-    private MyLocationStyle myLocationStyle;
-
-    private AMapLocationClient locationClient = null;
-    private AMapLocationClientOption locationOption = null;
-
     //所需要申请的权限数组
     private static final String[] permissionsArray = new String[]{
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,22 +77,11 @@ public class MainActivity extends AppCompatActivity {
         ActivityCollector.addActivity(this);
         getDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         Log.d(TAG, "onCreate: " + getDrawerLayout.getParent());
-        //获取地图控件引用
-        mMapView = (MapView) findViewById(R.id.iv_map);
-        //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
-        mMapView.onCreate(savedInstanceState);
         //注册成为订阅者
         EventBus.getDefault().register(this);
         //初始化
         init();
-        boolean granted = checkAndRequestPermission();
-        if (granted) {
-            showMap();
-        }
-        //初始化定位
-        initLocation();
-        //开启定位
-        startLocation();
+        showFriendsFragment();
     }
     //订阅方法，当接收到事件的时候，会调用该方法
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -109,41 +89,9 @@ public class MainActivity extends AppCompatActivity {
         icoImage.setImageBitmap(messageEvent.getMessage());
     }
 
-    private void showMap()
-    {
-        if (aMap == null) {
-            aMap = mMapView.getMap();
-            aMap.getUiSettings().setRotateGesturesEnabled(false);  //不可旋转
-            aMap.moveCamera(CameraUpdateFactory.zoomBy(6));
-            aMap.setTrafficEnabled(true);// 显示实时交通状况
-            aMap.getUiSettings().setMyLocationButtonEnabled(false);// 设置默认定位按钮是否显示
-            setUpMap();
-        }
-    }
-
-    /**
-     * 设置一些amap的属性
-     */
-    private void setUpMap() {
-        myLocationStyle = new MyLocationStyle();//初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
-        //-------------------------------------------------------------------
-        // 自定义系统定位蓝点
-        myLocationStyle.interval(2000); //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
-        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);//连续定位、蓝点不会移动到地图中心点，地图依照设备方向旋转，并且蓝点会跟随设备移动。 	LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER //LOCATION_TYPE_LOCATION_ROTATE
-        // 自定义定位蓝点图标
-        myLocationStyle.myLocationIcon(
-                BitmapDescriptorFactory.fromResource(R.drawable.gps_point));
-        // 自定义精度范围的圆形边框颜色
-        myLocationStyle.strokeColor(Color.argb(0, 0, 0, 0));
-        // 自定义精度范围的圆形边框宽度
-        myLocationStyle.strokeWidth(0);
-        // 设置圆形的填充颜色
-        myLocationStyle.radiusFillColor(Color.argb(0, 0, 0, 0));
-        // 将自定义的 myLocationStyle 对象添加到地图上
-        aMap.setMyLocationStyle(myLocationStyle);
-        aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
-        // 设置定位的类型为定位模式 ，可以由定位、跟随或地图根据面向方向旋转几种
-//        aMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);
+    private boolean checkAndRequestPermission() {
+        return RunntimePermissionHelper.checkAndRequestForRunntimePermission(
+                this, permissionsArray);
     }
 
     private void init(){
@@ -155,6 +103,40 @@ public class MainActivity extends AppCompatActivity {
          * 先获取navigation控件，通过getHeadView获取设置的头xml
          */
         navigationView = (NavigationView)findViewById(R.id.nav_view);
+        navigationView.setCheckedItem(R.id.nav_friends);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                //可以写触发逻辑处理
+                navigationView.setCheckedItem(item.getItemId());
+                drawerLayout.closeDrawers();
+                switch (item.getItemId()){
+                    case R.id.nav_friends:
+                        showFriendsFragment();
+//                        Toast.makeText(MainActivity.this,"Hello Friends!",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_call:
+                        showCallFragment();
+//                        Toast.makeText(MainActivity.this,"Hello Call!",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_location:
+                        showLocationFragment();
+//                        Toast.makeText(MainActivity.this,"Hello Location!",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_mail:
+                        showMailFragment();
+//                        Toast.makeText(MainActivity.this,"Hello Mail!",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_task:
+                        showTaskFragment();
+//                        Toast.makeText(MainActivity.this,"Hello Task!",Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
         View headerView = navigationView.getHeaderView(0);
         userText = (TextView) headerView.findViewById(R.id.username);
         emailText = (TextView) headerView.findViewById(R.id.mail);
@@ -177,10 +159,6 @@ public class MainActivity extends AppCompatActivity {
         userText.setText(intent.getStringExtra(Utils.LOGIN_USER));
         emailText.setText(intent.getStringExtra(Utils.LOGIN_EMAIL));
     }
-
-
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -199,11 +177,6 @@ public class MainActivity extends AppCompatActivity {
                 //打印数据库内容，测试用
                 List<UsersInfo> usersInfos = DataSupport.findAll(UsersInfo.class);
                 Toast.makeText(this,"数据库数据：" + usersInfos.size(),Toast.LENGTH_SHORT).show();
-//                for(UsersInfo usersInfo : usersInfos){ //遍历books数组的内容
-//                    Log.d(TAG, "The username is :" + usersInfo.getUsername());
-//                    Log.d(TAG, "The password is :" + usersInfo.getPassword());
-//                    Log.d(TAG, "The email is :" + usersInfo.getEmail());
-//                }
                 break;
             case R.id.action_log_off:
                 //写入数据到SP
@@ -221,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     //退出时的时间
     private long mExitTime;
@@ -248,32 +220,23 @@ public class MainActivity extends AppCompatActivity {
             System.exit(0);
         }
     }
-
     @Override
     protected void onResume() {
         super.onResume();
-        //在activity执行onResume时执行mMapView.onResume ()，重新绘制加载地图
-        mMapView.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
-        mMapView.onPause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
-        mMapView.onDestroy();
-        destroyLocation();
         //解除注册
         EventBus.getDefault().unregister(this);
         ActivityCollector.removeActivity(this);
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){ //权限号。
@@ -289,193 +252,6 @@ public class MainActivity extends AppCompatActivity {
             default:
         }
     }
-    private boolean checkAndRequestPermission() {
-        return RunntimePermissionHelper.checkAndRequestForRunntimePermission(
-                this, permissionsArray);
-    }
-
-    //-----------------定时获取坐标位置
-
-    // 根据控件的选择，重新设置定位参数
-    private void resetOption() {
-        // 设置是否需要显示地址信息
-        locationOption.setNeedAddress(true);
-        /**
-         * 设置是否优先返回GPS定位结果，如果30秒内GPS没有返回定位结果则进行网络定位
-         * 注意：只有在高精度模式下的单次定位有效，其他方式无效
-         */
-        locationOption.setGpsFirst(false);
-        // 设置是否开启缓存
-        locationOption.setLocationCacheEnable(true);
-        // 设置是否单次定位
-        locationOption.setOnceLocation(false);
-        //设置是否等待设备wifi刷新，如果设置为true,会自动变为单次定位，持续定位时不要使用
-        locationOption.setOnceLocationLatest(false);
-        //设置是否使用传感器
-        locationOption.setSensorEnable(false);
-        //设置是否开启wifi扫描，如果设置为false时同时会停止主动刷新，停止以后完全依赖于系统刷新，定位位置可能存在误差
-        // 设置发送定位请求的时间间隔,最小值为1000，如果小于1000，按照1000算
-        locationOption.setInterval(2000);
-        // 设置网络请求超时时间
-        locationOption.setHttpTimeOut(3000);
-        locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-    }
-
-    /**
-     * 开始定位
-     *
-     * @since 2.8.0
-     * @author hongming.wang
-     *
-     */
-    private void startLocation(){
-        //根据控件的选择，重新设置定位参数
-        resetOption();
-        // 设置定位参数
-        locationClient.setLocationOption(locationOption);
-        // 启动定位
-        locationClient.startLocation();
-    }
-
-    /**
-     * 停止定位
-     *
-     * @since 2.8.0
-     * @author hongming.wang
-     *
-     */
-    private void stopLocation(){
-        // 停止定位
-        locationClient.stopLocation();
-    }
-
-    /**
-     * 销毁定位
-     *
-     * @since 2.8.0
-     * @author hongming.wang
-     *
-     */
-    private void destroyLocation(){
-        if (null != locationClient) {
-            /**
-             * 如果AMapLocationClient是在当前Activity实例化的，
-             * 在Activity的onDestroy中一定要执行AMapLocationClient的onDestroy
-             */
-            locationClient.onDestroy();
-            locationClient = null;
-            locationOption = null;
-        }
-    }
-
-    /**
-     * 初始化定位
-     *
-     * @since 2.8.0
-     * @author hongming.wang
-     *
-     */
-    private void initLocation(){
-        //初始化client
-        locationClient = new AMapLocationClient(this.getApplicationContext());
-        locationOption = getDefaultOption();
-        //设置定位参数
-        locationClient.setLocationOption(locationOption);
-        // 设置定位监听
-        locationClient.setLocationListener(locationListener);
-    }
-
-    /**
-     * 默认的定位参数
-     * @since 2.8.0
-     * @author hongming.wang
-     *
-     */
-    private AMapLocationClientOption getDefaultOption(){
-        AMapLocationClientOption mOption = new AMapLocationClientOption();
-        mOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);//可选，设置定位模式，可选的模式有高精度、仅设备、仅网络。默认为高精度模式
-        mOption.setGpsFirst(false);//可选，设置是否gps优先，只在高精度模式下有效。默认关闭
-        mOption.setHttpTimeOut(30000);//可选，设置网络请求超时时间。默认为30秒。在仅设备模式下无效
-        mOption.setInterval(2000);//可选，设置定位间隔。默认为2秒
-        mOption.setNeedAddress(true);//可选，设置是否返回逆地理地址信息。默认是true
-        mOption.setOnceLocation(false);//可选，设置是否单次定位。默认是false
-        mOption.setOnceLocationLatest(false);//可选，设置是否等待wifi刷新，默认为false.如果设置为true,会自动变为单次定位，持续定位时不要使用
-        AMapLocationClientOption.setLocationProtocol(AMapLocationClientOption.AMapLocationProtocol.HTTP);//可选， 设置网络请求的协议。可选HTTP或者HTTPS。默认为HTTP
-        mOption.setSensorEnable(false);//可选，设置是否使用传感器。默认是false
-        mOption.setWifiScan(true); //可选，设置是否开启wifi扫描。默认为true，如果设置为false会同时停止主动刷新，停止以后完全依赖于系统刷新，定位位置可能存在误差
-        mOption.setLocationCacheEnable(true); //可选，设置是否使用缓存定位，默认为true
-        return mOption;
-    }
-
-
-    /**
-     * 定位监听
-     */
-    AMapLocationListener locationListener = new AMapLocationListener() {
-        @Override
-        public void onLocationChanged(AMapLocation location) {
-            if (null != location) {
-                StringBuffer sb = new StringBuffer();
-                //errCode等于0代表定位成功，其他的为定位失败，具体的可以参照官网定位错误码说明
-                if(location.getErrorCode() == 0){
-                    if(location.getAccuracy() < 50)
-                    mLatitude = location.getLatitude();
-                    mLongitude = location.getLongitude();
-                    sb.append("定位成功" + "\n");
-                    sb.append("定位类型: " + location.getLocationType() + "\n");
-                    sb.append("经    度    : " + mLongitude + "\n");
-                    sb.append("纬    度    : " + mLatitude + "\n");
-                    sb.append("精    度    : " + location.getAccuracy() + "米" + "\n");
-                    sb.append("提供者    : " + location.getProvider() + "\n");
-
-                    sb.append("速    度    : " + location.getSpeed() + "米/秒" + "\n");
-                    sb.append("角    度    : " + location.getBearing() + "\n");
-                    // 获取当前提供定位服务的卫星个数
-                    sb.append("星    数    : " + location.getSatellites() + "\n");
-                    sb.append("国    家    : " + location.getCountry() + "\n");
-                    sb.append("省            : " + location.getProvince() + "\n");
-                    sb.append("市            : " + location.getCity() + "\n");
-                    sb.append("城市编码 : " + location.getCityCode() + "\n");
-                    sb.append("区            : " + location.getDistrict() + "\n");
-                    sb.append("区域 码   : " + location.getAdCode() + "\n");
-                    sb.append("地    址    : " + location.getAddress() + "\n");
-                    sb.append("兴趣点    : " + location.getPoiName() + "\n");
-                    //定位完成的时间
-                    sb.append("定位时间: " + Utils.formatUTC(location.getTime(), "yyyy-MM-dd HH:mm:ss") + "\n");
-                    if (firstMoveToLocation == true) {
-                        moveToLatLng();
-                        firstMoveToLocation = false;
-                    }
-
-
-                } else {
-                    //定位失败
-                    sb.append("定位失败" + "\n");
-                    sb.append("错误码:" + location.getErrorCode() + "\n");
-                    sb.append("错误信息:" + location.getErrorInfo() + "\n");
-                    sb.append("错误描述:" + location.getLocationDetail() + "\n");
-                }
-                //定位之后的回调时间
-                sb.append("回调时间: " + Utils.formatUTC(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss") + "\n");
-
-                //解析定位结果，
-                String result = sb.toString();
-//                Log.d(TAG, "onLocationChanged: " + result);
-            } else {
-//                tvResult.setText("定位失败，loc is null");
-                Log.d(TAG, "onLocationChanged: " + "定位失败，loc is null");
-            }
-        }
-    };
-
-    //移动到指定位置
-    private void moveToLatLng (){
-        //然后可以移动到定位点,使用animateCamera就有动画效果
-        //取出经纬度
-        LatLng latLng = new LatLng(mLatitude, mLongitude);
-        aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
-    }
-
     //从SharedPreferences获取图片
     public void getBitmapFromSharedPreferences(){
         SharedPreferences sharedPreferences=getSharedPreferences(Utils.SAVE_SOMETHING, Context.MODE_PRIVATE);
@@ -493,6 +269,119 @@ public class MainActivity extends AppCompatActivity {
             //第三步:利用ByteArrayInputStream生成Bitmap
             Bitmap bitmap= BitmapFactory.decodeStream(byteArrayInputStream);
             icoImage.setImageBitmap(bitmap);
+        }
+    }
+
+    /**
+     * 显示“朋友”碎片
+     */
+    private void showFriendsFragment(){
+        //开启事务，fragment的控制是由事务来实现的
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        //式（add），初始化fragment并添加到事务中，如果为null就new一个
+        if(friendsFragment == null){
+            friendsFragment = new FragmentFriends();
+            transaction.add(R.id.id_frame, friendsFragment);
+        }
+        //隐藏所有fragment
+        hideFragment(transaction);
+        //显示需要显示的fragment
+        transaction.show(friendsFragment);
+        //提交事务
+        transaction.commit();
+    }
+    /**
+     * 显示“电话”碎片
+     */
+    private void showCallFragment(){
+        //开启事务，fragment的控制是由事务来实现的
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        //式（add），初始化fragment并添加到事务中，如果为null就new一个
+        if(callFragment == null){
+            callFragment = new FragmentCall();
+            transaction.add(R.id.id_frame, callFragment);
+        }
+        //隐藏所有fragment
+        hideFragment(transaction);
+        //显示需要显示的fragment
+        transaction.show(callFragment);
+        //提交事务
+        transaction.commit();
+    }
+    /**
+     * 显示“位置”碎片
+     */
+    private void showLocationFragment(){
+        //开启事务，fragment的控制是由事务来实现的
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        //式（add），初始化fragment并添加到事务中，如果为null就new一个
+        if(locationFragment == null){
+            locationFragment = new FragmentLocation();
+            transaction.add(R.id.id_frame, locationFragment);
+        }
+        //隐藏所有fragment
+        hideFragment(transaction);
+        //显示需要显示的fragment
+        transaction.show(locationFragment);
+        //提交事务
+        transaction.commit();
+    }
+    /**
+     * 显示“邮件”碎片
+     */
+    private void showMailFragment(){
+        //开启事务，fragment的控制是由事务来实现的
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        //式（add），初始化fragment并添加到事务中，如果为null就new一个
+        if(mailFragment == null){
+            mailFragment = new FragmentMail();
+            transaction.add(R.id.id_frame, mailFragment);
+        }
+        //隐藏所有fragment
+        hideFragment(transaction);
+        //显示需要显示的fragment
+        transaction.show(mailFragment);
+        //提交事务
+        transaction.commit();
+    }
+    /**
+     * 显示“事务”碎片
+     */
+    private void showTaskFragment(){
+        //开启事务，fragment的控制是由事务来实现的
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        //式（add），初始化fragment并添加到事务中，如果为null就new一个
+        if(taskFragment == null){
+            taskFragment = new FragmentTask();
+            transaction.add(R.id.id_frame, taskFragment);
+        }
+        //隐藏所有fragment
+        hideFragment(transaction);
+        //显示需要显示的fragment
+        transaction.show(taskFragment);
+        //提交事务
+        transaction.commit();
+    }
+
+    /**
+     * 隐藏所有碎片，在显示某个碎片前调用一次，重置fragment
+     * @param transaction
+     */
+    private void hideFragment(FragmentTransaction transaction){
+        if(friendsFragment != null){
+            transaction.hide(friendsFragment);
+        }
+        if(callFragment != null){
+            transaction.hide(callFragment);
+        }
+        if(locationFragment != null){
+            transaction.hide(locationFragment);
+        }
+        if(mailFragment != null){
+            transaction.hide(mailFragment);
+        }
+        if(taskFragment != null){
+            transaction.hide(taskFragment);
         }
     }
 }

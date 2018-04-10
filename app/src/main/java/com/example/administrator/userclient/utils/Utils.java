@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.example.administrator.userclient;
+package com.example.administrator.userclient.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -126,7 +126,7 @@ public class Utils {
 		bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
 		//第二步:利用Base64将字节数组输出流中的数据转换成字符串String
 		byte[] byteArray = byteArrayOutputStream.toByteArray();
-		String imageString = new String(Base64.encodeToString(byteArray, Base64.DEFAULT));
+		String imageString = Base64.encodeToString(byteArray, Base64.DEFAULT);
 		return imageString;
 	}
 
